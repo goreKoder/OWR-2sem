@@ -37,7 +37,16 @@ const PORT = process.env.PORT || 3000; // Используем PORT из .env и
  */
 app.get("/events", async (req, res) => {
 	try {
-		const events = await Event.findAll(); // Получаем всех пользователей
+		// GET /events?startDate=2023-01-01&endDate=2023-12-31
+		const { startDate, endDate } = req.query;
+		// const events = await Event.findAll(); // Получаем всех пользователей
+		const events = await Event.findAll({
+			where: {
+				date: {
+					[Op.between]: [new Date(startDate), new Date(endDate)],
+				},
+			},
+		});
 		res.status(200).json(events);
 	} catch (err) {
 		res.status(500).send("ошибка сервера", err);
@@ -56,12 +65,15 @@ app.get("/events/:id", async (req, res) => {
 });
 app.post("/events", async (req, res) => {
 	try {
-		const { title, description, date, createdby } = req.body;
+		const { title, description, date, createdby, startDate, endDate } =
+			req.body;
 		const eventss = await Event.create({
 			title,
 			description,
 			date,
 			createdby,
+			startDate,
+			endDate,
 		});
 		res.status(201).json(eventss);
 	} catch (err) {
@@ -72,9 +84,10 @@ app.post("/events", async (req, res) => {
 app.put("/events/:id", async (req, res) => {
 	try {
 		const paramID = req.params.id;
-		const { title, description, date, createdBy } = req.body;
+		const { title, description, date, createdBy, startDate, endDate } =
+			req.body;
 		const [updatedRowsCount, [updatedUser]] = await Event.update(
-			{ title, description, date, createdBy }, // Поля для обновления
+			{ title, description, date, createdBy, startDate, endDate }, // Поля для обновления
 			{
 				where: { id: paramID }, // Условие для поиска пользователя
 				returning: true, // Возвращаем обновленную запись
