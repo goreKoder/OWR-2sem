@@ -3,7 +3,7 @@ require("dotenv").config();
 const cors = require("cors");
 var morgan = require("morgan");
 const swaggerUi = require("swagger-ui-express");
-const swaggerDocs = require("./swagger");
+const swaggerJsDoc = require("swagger-jsdoc");
 const { ValidationError, NotFoundError } = require("./errors.js");
 const User = require("./SQLtables/users.js");
 const Event = require("./SQLtables/events.js");
@@ -13,7 +13,42 @@ const app = express();
 app.use(express.json()); // Для обработки входящих JSON-запросов
 app.use(cors()); // Для разрешения кросс-доменных запросов
 app.use(morgan("combined"));
+// Swagger setup
+const swaggerOptions = {
+	swaggerDefinition: {
+		openapi: "3.0.0",
+		info: {
+			title: "Events API",
+			version: "1.0.0",
+			description: "API for managing events",
+		},
+		servers: [
+			{
+				url: "http://localhost:5000",
+			},
+		],
+		components: {
+			securitySchemes: {
+				ApiKeyAuth: {
+					type: "apiKey",
+					in: "header",
+					name: "api_key",
+					description: "API Key для доступа к защищенным маршрутам",
+				},
+			},
+		},
+		security: [
+			{
+				ApiKeyAuth: [1234],
+			},
+		],
+	},
+	apis: ["./index.js"],
+};
+
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 app.use((err, req, res, next) => {
 	if (err instanceof ValidationError) {
 		return res.status(err.statusCode).json({ error: err.message });
@@ -26,23 +61,42 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 3000; // Используем PORT из .env или 3000 по умолчанию
+
 /**
  * @swagger
- * /:
+ * /events:
  *   get:
- *     summary: Отображает приветственное сообщение
+ *     summary:
  *     responses:
  *       200:
- *         description: Успешный ответ
+ *         description: выводим массив событий
  */
 app.get("/events", async (req, res) => {
 	try {
-		const events = await Event.findAll(); // Получаем всех пользователей
+		// GET /events?startDate=2023-01-01&endDate=2023-12-31
+		const { startDate, endDate } = req.query;
+		// const events = await Event.findAll(); // Получаем всех пользователей
+		const events = await Event.findAll({
+			where: {
+				date: {
+					[Op.between]: [new Date(startDate), new Date(endDate)],
+				},
+			},
+		});
 		res.status(200).json(events);
 	} catch (err) {
 		res.status(500).send("ошибка сервера", err);
 	}
 });
+/**
+ * @swagger
+ * /events/{id}:
+ *   get:
+ *     summary:
+ *     responses:
+ *       200:
+ *         description: выводим одного события
+ */
 app.get("/events/:id", async (req, res) => {
 	try {
 		const paramID = req.params.id;
@@ -54,14 +108,26 @@ app.get("/events/:id", async (req, res) => {
 		// res.status(500).send("ошибка сервера");
 	}
 });
+/**
+ * @swagger
+ * /events:
+ *   post:
+ *     summary:
+ *     responses:
+ *       200:
+ *         description: добавляем события
+ */
 app.post("/events", async (req, res) => {
 	try {
-		const { title, description, date, createdby } = req.body;
+		const { title, description, date, createdby, startDate, endDate } =
+			req.body;
 		const eventss = await Event.create({
 			title,
 			description,
 			date,
 			createdby,
+			startDate,
+			endDate,
 		});
 		res.status(201).json(eventss);
 	} catch (err) {
@@ -69,12 +135,22 @@ app.post("/events", async (req, res) => {
 		// res.status(500).send("ошибка сервера");
 	}
 });
+/**
+ * @swagger
+ * /events/{id}:
+ *   put:
+ *     summary:
+ *     responses:
+ *       200:
+ *         description: редактирование события
+ */
 app.put("/events/:id", async (req, res) => {
 	try {
 		const paramID = req.params.id;
-		const { title, description, date, createdBy } = req.body;
+		const { title, description, date, createdBy, startDate, endDate } =
+			req.body;
 		const [updatedRowsCount, [updatedUser]] = await Event.update(
-			{ title, description, date, createdBy }, // Поля для обновления
+			{ title, description, date, createdBy, startDate, endDate }, // Поля для обновления
 			{
 				where: { id: paramID }, // Условие для поиска пользователя
 				returning: true, // Возвращаем обновленную запись
@@ -83,13 +159,22 @@ app.put("/events/:id", async (req, res) => {
 		if (updatedRowsCount === 0) {
 			res.send(NotFoundError("событие не нейдено"));
 		}
-		res.status(200).json(updatedUser); // Отправляем обновленного пользователя
+		res.status(200).json(updatedUser); // Отправляем обновленного события
 	} catch (err) {
 		res.send(new ValidationError("ошибка валидации"));
 
 		// res.status(500).send("ошибка сервера");
 	}
 });
+/**
+ * @swagger
+ * /events/{id}:
+ *   delete:
+ *     summary:
+ *     responses:
+ *       200:
+ *         description: удаляем событие
+ */
 app.delete("/events/:id", async (req, res) => {
 	try {
 		const eventid = req.params.id;
@@ -105,6 +190,15 @@ app.delete("/events/:id", async (req, res) => {
 		// res.status(500).send("ошибка сервера");
 	}
 });
+/**
+ * @swagger
+ * /users:
+ *   get:
+ *     summary:
+ *     responses:
+ *       200:
+ *         description: выводим список пользователей
+ */
 app.get("/users", async (req, res) => {
 	try {
 		const users = await User.findAll();
@@ -113,6 +207,15 @@ app.get("/users", async (req, res) => {
 		res.status(500).send("ошибка сервера");
 	}
 });
+/**
+ * @swagger
+ * /users:
+ *   post:
+ *     summary:
+ *     responses:
+ *       200:
+ *         description: добавляем пользователя
+ */
 app.post("/users", async (req, res) => {
 	try {
 		const { name, email } = req.body;
