@@ -10,6 +10,8 @@ const Event = require("./SQLtables/events.js");
 // Создаем объект приложения
 const app = express();
 // Настраиваем middleware
+// configurePassport(passport);  // не работает (да и не надо)
+
 app.use(express.json()); // Для обработки входящих JSON-запросов
 app.use(cors()); // Для разрешения кросс-доменных запросов
 app.use(morgan("combined"));
@@ -230,6 +232,11 @@ app.post("/users", async (req, res) => {
 		// res.status(500).send("всё поломалося" + err);
 	}
 });
+app.use("/auth", loginJwt); // подключаем маршруты из routes
+app.use("/public", getEvent);
+// app.use(passport.initialize);
+app.use("/index", forIndex);
+
 // Запускаем сервер
 app.listen(PORT, "localhost", (err) => {
 	if (err) {
@@ -238,15 +245,14 @@ app.listen(PORT, "localhost", (err) => {
 	console.log(`Сервер запущен на порту ${PORT}`);
 });
 
-const sequelize = require("./config/db.js");
 const checkConnection = async () => {
 	try {
 		await sequelize.authenticate();
 		console.log("подключение к базе данных прошло успешно");
-		await sequelize.sync();
+		await sequelize.sync(); //{ force: true } для пересоздания  { alter: true } для добавления
 		console.log("Все модели успешно синхронизированы");
 	} catch (error) {
-		console.error("жопа с базой: ", error);
+		console.error("нет подключения к базе данных: ", error);
 	}
 };
 checkConnection();

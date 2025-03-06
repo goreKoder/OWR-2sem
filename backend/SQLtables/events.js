@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require("sequelize");
-const sequelize = require("../config/db.js"); // Убедитесь, что путь к вашему файлу конфигурации корректен
-const User = require("./users.js");
+import { Model, DataTypes } from "sequelize";
+import sequelize from "../config/db.js"; // Убедитесь, что путь к вашему файлу конфигурации корректен
+import User from "./users.js";
 class Event extends Model {}
 
 Event.init(
@@ -26,15 +26,15 @@ Event.init(
 			type: DataTypes.INTEGER,
 			allowNull: false, // Обязательное поле
 			references: {
-				model: "Users", // Имя таблицы, на которую ссылаемся
+				model: "users", // Имя таблицы, на которую ссылаемся
 				key: "id", // Поле, на которое ссылаемся
 			},
 		},
-		startDate: {
+		startdate: {
 			type: DataTypes.DATE,
 			allowNull: false, // Обязательное поле
 		},
-		endDate: {
+		enddate: {
 			type: DataTypes.DATE,
 			allowNull: false, // Обязательное поле
 		},
@@ -51,7 +51,5 @@ Event.init(
 // 	foreignKey: "createdBy", // Указываем внешний ключ в таблице мероприятий
 // 	targetKey: "id", // Указываем, что поле id в таблице пользователей является целевым
 // });
-// Устанавливаем связь
-// User.hasMany(Event, { foreignKey: "id" });
-// Event.belongsTo(User, { foreignKey: "createdby" });
-module.exports = Event;
+
+export default Event;
