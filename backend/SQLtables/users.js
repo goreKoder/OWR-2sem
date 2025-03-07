@@ -26,6 +26,10 @@ User.init(
 			type: DataTypes.STRING,
 			allowNull: false, // Обязательное поле
 		},
+		role: {
+			type: DataTypes.ENUM("user", "admin"), // Добавляем поле role
+			defaultValue: "user", // По умолчанию роль — user
+		},
 	},
 	{
 		sequelize,
