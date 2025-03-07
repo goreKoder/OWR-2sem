@@ -1,52 +1,46 @@
 import express from "express";
-import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../SQLtables/users.js";
 import Event from "../SQLtables/events.js";
-import passport from "passport";
-import dotenv from "dotenv";
 import { ValidationError, NotFoundError } from "../errors.js";
+import { getUserID } from "../config/passport.js";
 
-dotenv.config();
-const secretKey = process.env.JWT_SECRET;
 const router = express.Router();
-router.use(passport.authenticate("jwt", { session: false }));
 router.get("/events", async (req, res) => {
+	/**
+	 * @swagger
+	 * /events/{id}:
+	 *   get:
+	 *     summary:
+	 *     responses:
+	 *       200:
+	 *         description: выводим одного события
+	 */
 	try {
-		let userId;
 		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
-		if (!token) {
-			return res.status(401).json({ error: "нет никакого токена" });
-		}
-		jwt.verify(token, secretKey, (err, decoded) => {
-			if (err) {
-				return res.status(401).json({ error: "фиговый токен" });
-			}
-			// Теперь вы можете использовать данные из decoded
-			userId = decoded.id; // Например, извлечение идентификатора пользователя
-		});
-
-		const eventss = await Event.findByPk(userId); // Поиск мероприятия по ID
+		const UserID = await getUserID(token);
+		const eventss = await Event.findByPk(UserID); // Поиск мероприятия по ID
 		res.status(200).json(eventss);
 	} catch (err) {
 		res.json(new NotFoundError("событие не нейдено") + err);
 	}
 });
 router.post("/events", async (req, res) => {
+	/**
+	 * @swagger
+	 * /events:
+	 *   post:
+	 *     summary:
+	 *     responses:
+	 *       200:
+	 *         description: добавляем события
+	 */
 	try {
-		let createdby;
 		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
-		if (!token) {
-			return res.status(401).json({ error: "нет никакого токена" });
-		}
-		jwt.verify(token, secretKey, (err, decoded) => {
-			if (err) {
-				return res.status(401).json({ error: "фиговый токен" });
-			}
-			// Теперь вы можете использовать данные из decoded
-			createdby = decoded.id; // Например, извлечение идентификатора пользователя
-		});
 		const { title, description, date, startdate, enddate } = req.body;
+		const createdby = await getUserID(token);
+		console.log(createdby);
+		console.log(getUserID(token));
 		const events = await Event.create({
 			title,
 			description,
@@ -58,7 +52,6 @@ router.post("/events", async (req, res) => {
 		res.status(201).json(events);
 	} catch (err) {
 		res.json(new ValidationError("ошибка валидации") + err);
-		// res.status(500).send("ошибка сервера");
 	}
 	// {
 	// 	"title": "Новое мероприятие",
@@ -70,19 +63,18 @@ router.post("/events", async (req, res) => {
 });
 
 router.put("/events/:id", async (req, res) => {
+	/**
+	 * @swagger
+	 * /events/{id}:
+	 *   put:
+	 *     summary:
+	 *     responses:
+	 *       200:
+	 *         description: редактирование события
+	 */
 	try {
-		let userId;
 		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
-		if (!token) {
-			return res.status(401).json({ error: "нет никакого токена" });
-		}
-		jwt.verify(token, secretKey, (err, decoded) => {
-			if (err) {
-				return res.status(401).json({ error: "фиговый токен" });
-			}
-			// Теперь вы можете использовать данные из decoded
-			userId = decoded.id; // Например, извлечение идентификатора пользователя
-		});
+		const userId = await getUserID(token);
 		const eventid = req.params.id;
 		const { title, description, date, startdate, enddate } = req.body;
 		const [updatedRowsCount, [updatedUser]] = await Event.update(
@@ -98,11 +90,18 @@ router.put("/events/:id", async (req, res) => {
 		res.status(200).json(updatedUser); // Отправляем обновленного пользователя
 	} catch (err) {
 		res.send(new ValidationError("ошибка валидации"));
-
-		// res.status(500).send("ошибка сервера");
 	}
 });
 router.delete("/events/:id", async (req, res) => {
+	/**
+	 * @swagger
+	 * /events/{id}:
+	 *   delete:
+	 *     summary:
+	 *     responses:
+	 *       200:
+	 *         description: удаляем событие
+	 */
 	try {
 		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
 		if (!token) {
@@ -110,7 +109,7 @@ router.delete("/events/:id", async (req, res) => {
 		}
 		jwt.verify(token, secretKey, (err, decoded) => {
 			if (err) {
-				return res.status(401).json({ error: "фиговый токен" });
+				return res.status(401).json({ error: "не коректный токен" });
 			}
 		});
 		const eventid = req.params.id;
@@ -122,8 +121,6 @@ router.delete("/events/:id", async (req, res) => {
 		res.status(200).json(del);
 	} catch (err) {
 		res.send(new NotFoundError("событие не нейдено"));
-
-		// res.status(500).send("ошибка сервера");
 	}
 });
 export default router;
