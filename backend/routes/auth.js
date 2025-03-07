@@ -11,8 +11,8 @@ const router = express.Router();
 
 router.post("/register", async (req, res) => {
 	try {
-		const { email, name, password } = req.body;
-		const user = await User.create({ email, name, password });
+		const { email, name, password, role } = req.body;
+		const user = await User.create({ email, name, password, role });
 		res.status(200).send("Аутентификация успешна");
 	} catch (err) {
 		res.status(500).json("ошибка сервера" + err);
@@ -22,6 +22,7 @@ router.post("/register", async (req, res) => {
 // 	"name": "апапап",
 // 	"email": "chtoto@mail.ru",
 //  "password": "parol"
+//  "role": "user"
 // }
 router.post("/login", async (req, res) => {
 	let { email, password } = req.body;
@@ -33,9 +34,13 @@ router.post("/login", async (req, res) => {
 		if (!isPasswordValid) {
 			return res.status(401).json("Неверный пароль");
 		}
-		const tocen = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-			expiresIn: "1h",
-		}); //  потом попробовать просто user.id
+		const tocen = jwt.sign(
+			{ id: user.id, role: user.role },
+			process.env.JWT_SECRET,
+			{
+				expiresIn: "1h",
+			}
+		); //  потом попробовать просто user.id
 		res.status(200).json("Авторизация успешна, вот токен:  " + tocen);
 	} catch (err) {
 		console.log(err);
