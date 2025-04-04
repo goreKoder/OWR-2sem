@@ -1,5 +1,6 @@
 class ValidationError extends Error {
-	constructor(message) {
+	statusCode: number;  // Явное объявление свойства
+	constructor(message: string) {
 		super(message);
 		this.name = "ValidationError";
 		this.statusCode = 400; // Код состояния для ошибки валидации
@@ -7,7 +8,8 @@ class ValidationError extends Error {
 }
 
 class NotFoundError extends Error {
-	constructor(message) {
+	statusCode: number;  // Явное объявление свойства
+	constructor(message: string) {
 		super(message);
 		this.name = "NotFoundError";
 		this.statusCode = 404; // Код состояния для не найденного ресурса

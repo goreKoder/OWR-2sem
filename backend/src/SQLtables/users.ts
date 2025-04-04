@@ -1,8 +1,33 @@
-import { Model, DataTypes } from "sequelize";
-import sequelize from "../config/db.js";
+import { Model, DataTypes, Optional  } from "sequelize";
+import sequelize from "../config/db";
 import bcrypt from "bcrypt";
-import Event from "./events.js";
-class User extends Model {}
+import Event from "./events";
+// 1. Интерфейс для атрибутов пользователя
+interface UserAttributes {
+	id: number;
+	name: string;
+	email: string;
+	password: string;
+	role: 'user' | 'admin';
+  }
+  
+  // 2. Интерфейс для атрибутов при создании (без id)
+  interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
+  
+  // 3. Класс модели с типизацией
+  class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+	declare id: number;
+	declare name: string;
+	declare email: string;
+	declare password: string;
+	declare role: 'user' | 'admin';
+  
+	// Метод для проверки пароля
+	async comparePassword(candidatePassword: string): Promise<boolean> {
+	  return bcrypt.compare(candidatePassword, this.password);
+	}
+  }
+// class User extends Model {}
 User.init(
 	{
 		id: {

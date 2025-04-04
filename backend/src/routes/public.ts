@@ -1,14 +1,12 @@
-import express from "express";
-import User from "../SQLtables/users.js";
-import Event from "../SQLtables/events.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import { getUserRole } from "../config/passport.js";
-
+import express, {Request,Response} from "express";
+import User from "../SQLtables/users";
+import Event from "../SQLtables/events";
+// import path from "path";
+import { Op } from 'sequelize';
+import { getUserRole } from "../config/passport";
 const router = express.Router();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-router.get("/events", async (req, res) => {
+// const __dirname = path.resolve();
+router.get("/events", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /events:
@@ -18,18 +16,27 @@ router.get("/events", async (req, res) => {
 	 *       200:
 	 *         description: выводим массив событий
 	 */
+	interface DateEvent{
+		startdate: string;
+		enddate: string;
+	}
 	try {
 		// GET http://localhost:5000/events?startdate=2023-10-25T10:00:00Z&enddate=2023-10-27T11:00:00Z
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
-		const userRole = getUserRole(token);
-		if (userRole !== "admin") {
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
+		}
+		const userRole = await getUserRole(token);
+		if ( userRole !== "admin") {
 			res.status(400).sendFile("ad1ea489daeda0af0a16fea188c87452.jpg");
 		}
-		const { startdate, enddate } = req.query;
+		const { startdate, enddate } = req.query ;
+		
 		const events = await Event.findAll({
 			where: {
 				date: {
-					[Op.between]: [new Date(startdate), new Date(enddate)],
+					[Op.between]: [new Date(String(startdate)), new Date(String(enddate))],
 				},
 			},
 		});
@@ -38,7 +45,7 @@ router.get("/events", async (req, res) => {
 		res.status(500).json("ошибка сервера" + err);
 	}
 });
-router.get("/users", async (req, res) => {
+router.get("/users", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /users:
@@ -49,14 +56,19 @@ router.get("/users", async (req, res) => {
 	 *         description: выводим список пользователей
 	 */
 	try {
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
+		}
 		const userRole = await getUserRole(token);
-		const imagePath = path.join(
-			__dirname,
-			"ad1ea489daeda0af0a16fea188c87452.jpg"
-		);
+		// const imagePath = path.join(
+		// 	__dirname,
+		// 	"ad1ea489daeda0af0a16fea188c87452.jpg"
+		// );
 		if (userRole != "admin") {
-			res.status(400).sendFile(imagePath);
+			// res.status(400).sendFile(imagePath);
+			res.status(400).send("ты не админ")
 		} else {
 			const users = await User.findAll();
 			res.status(200).json(users);
@@ -65,7 +77,7 @@ router.get("/users", async (req, res) => {
 		res.status(500).json("ошибка сервера " + err);
 	}
 });
-router.patch("/users/:id/role", async (req, res) => {
+router.patch("/users/:id/role", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /public/users/{id}/role:
@@ -77,14 +89,19 @@ router.patch("/users/:id/role", async (req, res) => {
 	 */
 	try {
 		let userId = req.params.id;
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
+		}
 		const userRole = await getUserRole(token);
-		const imagePath = path.join(
-			__dirname,
-			"ad1ea489daeda0af0a16fea188c87452.jpg"
-		);
+		// const imagePath = path.join(
+		// 	__dirname,
+		// 	"ad1ea489daeda0af0a16fea188c87452.jpg"
+		// );
 		if (userRole != "admin") {
-			res.status(400).sendFile(imagePath);
+			// res.status(400).sendFile(imagePath);
+			res.status(400).send("ты не админ")
 		} else {
 			const users = await User.update(req.body, {
 				where: { id: userId }, // Условие для поиска пользователя

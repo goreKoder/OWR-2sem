@@ -1,0 +1,19 @@
+{
+	"compilerOptions": {
+		"target": "ES6",
+		"module": "CommonJS",
+		"strict": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"outDir": "dist",
+		"rootDir": "src",
+		"types": ["node"], // Автоматически подключает @types/node
+    	"typeRoots": [
+    	  "./node_modules/@types", // Стандартный путь
+    	  "./src/types"            // Ваши кастомные типы
+    	]
+	},
+	"include": ["src"],
+	"exclude": ["node_modules"]
+}

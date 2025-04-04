@@ -1,15 +1,15 @@
 import { Strategy as JwtStrategy, ExtractJwt } from "passport-jwt";
 import passport from "passport";
-import jwt from "jsonwebtoken";
-import User from "../SQLtables/users.js";
+import jwt, { JwtPayload } from "jsonwebtoken";
+import User from "../SQLtables/users";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
 dotenv.config();
-const secretKey = process.env.JWT_SECRET;
+const secretKey = String(process.env.JWT_SECRET);
 const options = {
 	jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-	secretOrKey: process.env.JWT_SECRET,
+	secretOrKey: secretKey,
 };
 
 passport.use(
@@ -25,32 +25,29 @@ passport.use(
 		}
 	})
 );
-export async function createJWT(user, password) {
+export async function createJWT(user: any, password:string) {
 	const isPasswordValid = await bcrypt.compare(password, user.password);
-	if (!isPasswordValid) {
-		return res.status(401).json("Неверный пароль");
-	}
 	const tocen = jwt.sign(
 		{ id: user.id, role: user.role },
-		process.env.JWT_SECRET,
+		secretKey,
 		{
 			expiresIn: "1h",
 		}
 	);
 	return tocen;
 }
-export async function getUserID(token) {
+export async function getUserID(token:string) {
 	try {
-		const userID = jwt.verify(token, secretKey);
+		const userID = jwt.verify(token, secretKey) as JwtPayload;
 		return userID.id;
 	} catch (err) {
 		console.log(err);
 	}
 }
-export async function getUserRole(token) {
+export async function getUserRole(token:string) {
 	try {
-		const decoded = jwt.verify(token, secretKey);
-		return decoded.role;
+		const decoded = jwt.verify(token, secretKey) as JwtPayload;
+		return String(decoded.role);
 	} catch (err) {
 		console.log(err);
 	}

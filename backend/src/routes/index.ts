@@ -1,12 +1,23 @@
-import express from "express";
+import express,{Request, Response} from "express";
 import jwt from "jsonwebtoken";
-import User from "../SQLtables/users.js";
-import Event from "../SQLtables/events.js";
-import { ValidationError, NotFoundError } from "../errors.js";
-import { getUserID } from "../config/passport.js";
+import User from "../SQLtables/users";
+import Event from "../SQLtables/events";
+import { ValidationError, NotFoundError } from "../errors";
+import { getUserID } from "../config/passport";
+import dotenv from "dotenv";
 
+dotenv.config();
 const router = express.Router();
-router.get("/events", async (req, res) => {
+const secretKey: string|undefined = String(process.env.JWT_SECRET);
+
+interface UserData {
+	email: string;
+	name: string;
+	password: string;
+	role: string;
+}
+
+router.get("/events", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /events/{id}:
@@ -17,15 +28,20 @@ router.get("/events", async (req, res) => {
 	 *         description: выводим одного события
 	 */
 	try {
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
+		}
+		
 		const UserID = await getUserID(token);
 		const eventss = await Event.findByPk(UserID); // Поиск мероприятия по ID
 		res.status(200).json(eventss);
 	} catch (err) {
-		res.json(new NotFoundError("событие не нейдено") + err);
+		res.json(new NotFoundError("событие не нейдено" + err));
 	}
 });
-router.post("/events", async (req, res) => {
+router.post("/events", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /events:
@@ -36,7 +52,11 @@ router.post("/events", async (req, res) => {
 	 *         description: добавляем события
 	 */
 	try {
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
+		} 
 		const { title, description, date, startdate, enddate } = req.body;
 		const createdby = await getUserID(token);
 		console.log(createdby);
@@ -51,7 +71,7 @@ router.post("/events", async (req, res) => {
 		});
 		res.status(201).json(events);
 	} catch (err) {
-		res.json(new ValidationError("ошибка валидации") + err);
+		res.json(new ValidationError("ошибка валидации" + err));
 	}
 	// {
 	// 	"title": "Новое мероприятие",
@@ -62,7 +82,7 @@ router.post("/events", async (req, res) => {
 	// }
 });
 
-router.put("/events/:id", async (req, res) => {
+router.put("/events/:id", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /events/{id}:
@@ -73,7 +93,11 @@ router.put("/events/:id", async (req, res) => {
 	 *         description: редактирование события
 	 */
 	try {
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
+		}
 		const userId = await getUserID(token);
 		const eventid = req.params.id;
 		const { title, description, date, startdate, enddate } = req.body;
@@ -85,14 +109,14 @@ router.put("/events/:id", async (req, res) => {
 			}
 		);
 		if (updatedRowsCount === 0) {
-			res.send(NotFoundError("событие не нейдено"));
+			res.send(new NotFoundError("событие не нейдено"));
 		}
 		res.status(200).json(updatedUser); // Отправляем обновленного пользователя
 	} catch (err) {
 		res.send(new ValidationError("ошибка валидации"));
 	}
 });
-router.delete("/events/:id", async (req, res) => {
+router.delete("/events/:id", async (req:Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /events/{id}:
@@ -103,9 +127,10 @@ router.delete("/events/:id", async (req, res) => {
 	 *         description: удаляем событие
 	 */
 	try {
-		const token = req.headers["authorization"].split(" ")[1]; // Извлечение токена
-		if (!token) {
-			return res.status(401).json({ error: "нет никакого токена" });
+		let token:string = "";
+		const authorization = req.headers["authorization"]; // Извлечение токена
+		if (authorization){
+			token = authorization.split(" ")[1]
 		}
 		jwt.verify(token, secretKey, (err, decoded) => {
 			if (err) {

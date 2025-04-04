@@ -1,6 +1,6 @@
 import { Model, DataTypes } from "sequelize";
-import sequelize from "../config/db.js"; // Убедитесь, что путь к вашему файлу конфигурации корректен
-import User from "./users.js";
+import sequelize from "../config/db"; // Убедитесь, что путь к вашему файлу конфигурации корректен
+import User from "./users";
 class Event extends Model {}
 
 Event.init(

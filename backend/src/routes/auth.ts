@@ -1,13 +1,18 @@
-import express from "express";
-import User from "../SQLtables/users.js";
-import Event from "../SQLtables/events.js";
+import express, {Request, Response} from "express";
+import User from "../SQLtables/users";
+import Event from "../SQLtables/events";
 import dotenv from "dotenv";
-import { createJWT } from "../config/passport.js";
+import { createJWT } from "../config/passport";
 
 dotenv.config();
 const router = express.Router();
-
-router.post("/register", async (req, res) => {
+interface UserData {
+	email: string;
+	name: string;
+	password: string;
+	role: string;
+}
+router.post("/register", async (req: Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /auth/register:
@@ -18,11 +23,11 @@ router.post("/register", async (req, res) => {
 	 *         description: регистрация
 	 */
 	try {
-		const { email, name, password, role } = req.body;
-		const user = await User.create({ email, name, password, role });
-		res.status(200).send("Аутентификация успешна");
+		const { email, name, password, role }: UserData = req.body;
+		const user = await User.create({ email, name, password, role: role as 'user' | 'admin' });
+		res.status(200).send("Аутентификация успешна" );
 	} catch (err) {
-		res.status(500).json("ошибка сервера" + err);
+		res.status(500).json(`ошибка сервера ${err}`);
 	}
 });
 // {
@@ -31,7 +36,7 @@ router.post("/register", async (req, res) => {
 //  "password": "parol"
 //  "role": "user"
 // }
-router.post("/login", async (req, res) => {
+router.post("/login", async (req: Request, res:Response) => {
 	/**
 	 * @swagger
 	 * /auth/login:
@@ -41,7 +46,7 @@ router.post("/login", async (req, res) => {
 	 *       200:
 	 *         description: авторизация
 	 */
-	let { email, password } = req.body;
+	const { email, password }: UserData = req.body;
 	try {
 		const user = await User.findOne({
 			where: { email: email },
