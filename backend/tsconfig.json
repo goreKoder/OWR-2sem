@@ -12,7 +12,13 @@
     	"typeRoots": [
     	  "./node_modules/@types", // Стандартный путь
     	  "./src/types"            // Ваши кастомные типы
-    	]
+    	],
+		"baseUrl": "./",
+		"paths": {
+		  	"@config/*": ["src/config/*"],
+		  	"@routes/*": ["src/routes/*"],
+		  	"@SQLtables/*": ["src/SQLtables/*"]
+		}
 	},
 	"include": ["src"],
 	"exclude": ["node_modules"]

@@ -4,13 +4,20 @@
   "type": "commonjs",
   "description": "ФИО: Дроздов Глеб Алексеевич\r Номер группы: ПрИ-23",
   "main": "index.ts",
+  "lint-staged": {
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
   "scripts": {
     "dev": "nodemon src/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "tsc": "tsc",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write",
-    "check": "tsc --noEmit && eslint . --ext .ts"
+    "check": "tsc --noEmit && eslint . --ext .ts",
+    "prepare": "husky"
   },
   "keywords": [],
   "author": "",
@@ -50,9 +57,12 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.5",
     "globals": "^16.0.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
     "nodemon": "^3.1.9",
     "prettier": "^3.5.3",
     "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.28.0"
   }
