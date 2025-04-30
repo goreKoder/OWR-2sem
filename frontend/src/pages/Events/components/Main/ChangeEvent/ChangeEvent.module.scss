@@ -1,0 +1,68 @@
+.dialog_contaner{
+    height: 60%;
+    width: 30%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-style: none;
+    // background: rgba(0, 0, 0, 0.5);
+    
+    border-style:none;
+}
+.div_contaner{
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    
+    >div{
+        display: flex;
+    justify-content: center;
+    align-items:center;
+    flex-direction: column;
+    background-color:white;
+    padding: 3rem;
+    border-radius:10px;
+    >p{
+        color: red;
+    }
+    }
+}
+.title_input, .description_input, .date_input{
+    height: 1rem;
+    width: 15rem;
+    border-style: none;
+    border-radius:10px;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    background-color:#fff1a5;
+}
+
+//  работа с кнопками
+.button_component{
+    border-style: none;
+    background-color: aliceblue;
+    border-radius:10px;
+    padding: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.button{
+height: 2.6rem;
+width: 15rem;
+border-style: none;
+border-radius:5px;
+background-color:#1e5bbc;
+color:white;
+transition: 0.3s ease ;
+margin-top: 3rem;
+}
+.button:hover{
+background-color:#0e3168;
+}
+
+@media(max-width:1000px){
+    .dialog_contaner{
+        width: 25rem;
+    }
+}

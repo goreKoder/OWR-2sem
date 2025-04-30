@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import User from '@SQLtables/users';
-// import Event from '@SQLtables/events';
 import dotenv from 'dotenv';
 import { createJWT } from '@config/passport';
 
@@ -25,9 +24,10 @@ router.post('/register', async (req: Request, res: Response) => {
   try {
     const { email, name, password, role }: UserData = req.body;
     const user = await User.create({ email, name, password, role: role as 'user' | 'admin' });
-    res.status(200).send('Аутентификация успешна, новый пользователь: ' + user);
+    res.status(200).send(user);
+    console.log("Регистрация успешна")
   } catch (err) {
-    res.status(500).json(`ошибка сервера ${err}`);
+    res.status(500).json(err);
   }
 });
 // {
@@ -55,9 +55,10 @@ router.post('/login', async (req: Request, res: Response) => {
       throw new Error('Пользователь не найден');
     }
     const JWTtocen = await createJWT(user, password);
-    res.status(200).json('Авторизация успешна, вот токен:  ' + JWTtocen);
+    res.status(200).send({JWTtocen,user});
+    console.log("Авторизация успешна")
   } catch (err) {
-    res.status(500).json('ошибка сервера' + err);
+    res.status(500).json(err);
   }
 });
 export default router;

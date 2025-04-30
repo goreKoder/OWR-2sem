@@ -1,6 +1,5 @@
 import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-// import User from '@SQLtables/users';
 import Event from '@SQLtables/events';
 import { ValidationError, NotFoundError } from '../errors';
 import { getUserID } from '@config/passport';
@@ -34,9 +33,14 @@ router.get('/events', async (req: Request, res: Response) => {
       token = authorization.split(' ')[1];
     }
 
-    const UserID = await getUserID(token);
-    const eventss = await Event.findByPk(UserID); // Поиск мероприятия по ID
+    const UserID = await getUserID(token);// Поиск мероприятия по ID
+    const eventss = await Event.findAll({
+      where: {
+        createdby: UserID, // Ищем все события, где userId равен переданному значению
+      },
+    });
     res.status(200).json(eventss);
+    console.log("Массив отправлен")
   } catch (err) {
     res.json(new NotFoundError('событие не нейдено' + err));
   }

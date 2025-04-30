@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import User from '@SQLtables/users';
 import Event from '@SQLtables/events';
-// import path from "path";
 import { Op } from 'sequelize';
-import { getUserRole } from '@config/passport';
+import { getUserID, getUserRole } from '@config/passport';
 const router = express.Router();
-// const __dirname = path.resolve();
 router.get('/events', async (req: Request, res: Response) => {
   /**
    * @swagger
@@ -27,14 +25,16 @@ router.get('/events', async (req: Request, res: Response) => {
     if (authorization) {
       token = authorization.split(' ')[1];
     }
-    const userRole = await getUserRole(token);
-    if (userRole !== 'admin') {
-      res.status(400).sendFile('ad1ea489daeda0af0a16fea188c87452.jpg');
-    }
+    const UserID = await getUserID(token);
+    // const userRole = await getUserRole(token);
+    // if (userRole !== 'admin') {
+    //   res.status(400).sendFile('ad1ea489daeda0af0a16fea188c87452.jpg');
+    // }
     const { startdate, enddate } = req.query;
 
     const events = await Event.findAll({
       where: {
+        createdby: UserID,
         date: {
           [Op.between]: [new Date(String(startdate)), new Date(String(enddate))],
         },
