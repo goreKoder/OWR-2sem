@@ -1,4 +1,17 @@
 {
+  "compilerOptions": {
+    "target": "ES6",
+		"module": "CommonJS",
+		"strict": true,
+		"esModuleInterop": true,
+		"forceConsistentCasingInFileNames": true,
+		"skipLibCheck": true,
+		"rootDir": "src",
+    "baseUrl": ".",  // Базовая директория для импортов
+    "paths": {
+      "src/*": ["src/*"],      // Алиас `@/` для папки `src/`
+    }
+  },
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

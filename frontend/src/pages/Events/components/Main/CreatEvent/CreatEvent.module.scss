@@ -1,0 +1,76 @@
+// .overlay {
+//     position: fixed;
+//     top: 0;
+//     left: 0;
+//     right: 0;
+//     bottom: 0;
+//     background: rgba(0, 0, 0, 0.5);
+//     display: none; /* Скрываем по умолчанию */
+// }
+#myDialog{
+    height: 50%;
+    width: 35%;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    border-style: none;
+    // width: 200px;
+}
+.add_task{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+.add_task_contaner{
+    width: 65%;
+    height: 65%;
+    background-image: url(../../../../../assets/Aiga_firstaid.svg.png);
+    background-size:  cover;
+}
+.form{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.title_input, .description_input, .date_input{ //   работа с инпутами
+    height: 1rem;
+    width: 15rem;
+    border-style: none;
+    border-radius:10px;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    background-color:#fff1a5;
+}
+
+.div_button{//  работа с кнопками
+    display: flex;
+    justify-content: center;
+    align-items:center;
+    flex-direction: column;
+}
+.button_form{
+    height: 2.6rem;
+    width: 15rem;
+    border-style: none;
+    border-radius:5px;
+    background-color:#1e5bbc;
+    color:white;
+    transition: 0.3s ease ;
+    margin-top: 2rem;
+}
+.button_form:hover{
+    background-color:#0e3168;
+}
+
+@media(max-width:1000px){
+    #myDialog{
+        height: 50%;
+        width: 25rem;
+    }
+}

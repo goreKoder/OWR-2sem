@@ -1,0 +1,31 @@
+/* Главная страница */
+.body--home {
+    
+        background-color: aliceblue;
+    
+  }
+  
+  /* Страница регистрации */
+  .body--register {
+    background-color: rgb(255, 255, 255);
+  }
+  
+  /* Страница входа */
+  .body--login {
+    background-color: rgb(255, 255, 255);
+  }
+  
+  /* Страница событий */
+  .body--events {
+    background-color: rgb(38, 55, 70);
+    color:white;
+  }
+  
+  /* 404 страница */
+  .body--not-found {
+    // background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+    // color: white;
+  }
+  hr{
+        margin-bottom: 10px;
+  }

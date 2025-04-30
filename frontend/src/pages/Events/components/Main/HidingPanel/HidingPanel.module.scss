@@ -1,0 +1,47 @@
+.dialog_contaner{
+        // position: fixed;
+        // top: 0;
+        // left: 0;
+        // right: 0;
+        // bottom: 0;
+        position: absolute; /* Или position: absolute; */
+        background: rgba(0, 0, 0, 0.5);
+        border-style:none;
+        height: 100vh;
+        width: 100vw;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+}
+.div_contaner{
+        display: flex;
+        justify-content: center;
+        align-items:center;
+        height: 100%;
+        width: 100%;
+        >div{
+            display: flex;
+        justify-content: center;
+        align-items:center;
+        flex-direction: column;
+        background-color:white;
+        padding: 3rem;
+        border-radius:10px;
+        }
+}
+.p{
+    font-size: 4rem;
+}
+.button{
+    height: 2.6rem;
+    width: 15rem;
+    border-style: none;
+    border-radius:5px;
+    background-color:#1e5bbc;
+    color:white;
+    transition: 0.3s ease ;
+    margin-top: 3rem;
+}
+.button:hover{
+    background-color:#0e3168;
+}
