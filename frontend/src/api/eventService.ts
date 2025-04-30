@@ -25,14 +25,14 @@ export async function getEventsapi() {
         },
       },
     );
-    return response; //получаю список событий
+    return response; 
   } catch (err) {
     console.log("ошибка выгрузки событий" + err);
   }
 }
 
 export async function postEventsapi({ title, description, date }: Ievent) {
-  //     редактирование события
+  //     добавление события
   try {
     const response = await apiServer.post(
       "/index/events",
@@ -49,16 +49,16 @@ export async function postEventsapi({ title, description, date }: Ievent) {
         },
       },
     );
-    return response; //получаю событие
+    return response; 
   } catch (err) {
-    console.log("ошибка выгрузки событий" + err);
+    console.log("ошибка создания события" + err);
   }
 }
 
 export async function putEventsapi({ title, description, date, id }: Ievent) {
   try {
     const response = await apiServer.put(
-      "/index/events/" + id, //извлечение всех ивентов
+      "/index/events/" + id, //изменение ивента
       {
         title,
         description,
@@ -75,9 +75,9 @@ export async function putEventsapi({ title, description, date, id }: Ievent) {
         },
       },
     );
-    return response; //получаю список событий
+    return response; 
   } catch (err) {
-    console.log("ошибка выгрузки событий" + err);
+    console.log("ошибка изменения события" + err);
   }
 }
 
@@ -95,7 +95,28 @@ export async function deleteEventsapi({ id }: Ievent) {
           },
         },
       );
-    return response; //получаю список событий
+    return response; 
+  } catch (err) {
+    console.log("ошибка удаления события" + err);
+  }
+}
+
+export async function getSelectEventsapi({startdate, enddate}:Ievent) {
+  try {
+    const response = await apiServer.get(
+      "/public/events",
+      {
+        //извлечение всех ивентов
+        headers: {
+          Authorization: `Bearer ${cookiesObj.JWTtoken}`,
+        },
+        params: {
+          startdate ,
+          enddate
+        },
+      },
+    );
+    return response; 
   } catch (err) {
     console.log("ошибка выгрузки событий" + err);
   }

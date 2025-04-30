@@ -1,6 +1,6 @@
 import styles from "./Main.module.scss";
-import { getEventsapi } from "../../../../api/eventService";
-import { useEffect, useState } from "react";
+import { getEventsapi, getSelectEventsapi } from "../../../../api/eventService";
+import { useEffect, useState, useRef } from "react";
 import ChangeEvent from "./ChangeEvent/ChangeEvent";
 import CreatEvent from "./CreatEvent/CreatEvent";
 import DeleteEvents from "./DeleteEvent/DeleteEvent";
@@ -16,6 +16,11 @@ export default function Main() {
     startdate: Date;
     title: string;
   }
+
+  const refInput1 = useRef<HTMLInputElement>(null)
+  const refInput2 = useRef<HTMLInputElement>(null)
+  const [date1, setDate1] = useState(''); // Состояние для первого input
+  const [date2, setDate2] = useState(''); // Состояние для второго input
 
   const cookiesObj = Object.fromEntries(
     document.cookie
@@ -52,15 +57,41 @@ export default function Main() {
     loadEvents();
   }, [registerIndicator]); //  надо добавить сюда зависимости от ChangeEvent и CreatEvent
 
+
+  useEffect(()=>{//       выборка но датам
+    async function loadEvents() {
+      if(date1 !== ''&& date2 !== ''){
+        let startdate: Date = new Date(date1)
+        let enddate: Date = new Date  (date2)
+        let response = await getSelectEventsapi({startdate,enddate})
+        setEvents(response?.data);
+      }
+    }
+    loadEvents()
+  },[date1, date2])
+
   return (
     <main className={styles.main}>
       <div className={styles.div_input}>
-        <input
+        <input ref={refInput1}
+        onChange={()=>{
+          if(refInput1.current){
+            setDate1(refInput1.current?.value)
+          }
+          }
+          }
           className={styles.input}
           type="date"
           placeholder="введите дату"
         />
         <input
+        ref={refInput2}
+        onChange={()=>{
+          if(refInput2.current){
+            setDate2(refInput2.current?.value)
+          }
+          }
+          }
           className={styles.input}
           type="date"
           placeholder="введите дату"
