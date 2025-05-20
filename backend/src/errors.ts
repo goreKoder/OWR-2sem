@@ -17,22 +17,24 @@ class NotFoundError extends Error {
   }
 }
 
-export const errorHandler: ErrorRequestHandler = (
-  err: Error,
-  req: Request,
-  res: Response,
-  // next: NextFunction,
-) => {
-  if (err instanceof ValidationError) {
-    res.status(err.statusCode).json({ error: err.message });
-    return;
-  }
-  if (err instanceof NotFoundError) {
-    res.status(err.statusCode).json({ error: err.message });
-    return;
-  }
-  // Обработка других ошибок
-  res.status(500).json('Внутренняя ошибка сервера' + err);
-};
+// export const errorHandler: ErrorRequestHandler = (
+//   err: Error,
+//   req: Request,
+//   res: Response,
+//   // next: NextFunction,
+// ) => {
+//   if (err instanceof ValidationError) {
+//     res.status(err.statusCode).json({ error: err.message });
+//     return;
+//   }
+//   if (err instanceof NotFoundError) {
+//     res.status(err.statusCode).json({ error: err.message });
+//     return;
+//   }
+//   // Обработка других ошибок
+//   console.log("ошибка которую мы получаем")
+//   // console.log(err)
+//   // res.json('Внутренняя ошибка сервера' + err);
+// };
 
 export { ValidationError, NotFoundError };

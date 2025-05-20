@@ -1,7 +1,7 @@
 import styles from "./Main.module.scss";
 // import { getEventsapi, getSelectEventsapi } from "../../../../api/eventService";
 import { useEffect, useState, useRef } from "react";
-import ChangeEvent from "../../../../components/ChangeEvent/ChangeEvent";
+import ChangeEvent from "../../../../components/ChangeEvent/ChangeEvent"
 import CreatEvent from "../../../../components/CreatEvent/CreatEvent";
 import DeleteEvents from "../../../../components/DeleteEvent/DeleteEvent";
 import HidingPanel from "../../../../components/HidingPanel/HidingPanel";
@@ -36,11 +36,8 @@ export default function Main() {
   console.log("isAuth из Event = "+IndicatorState)
 
   useEffect(()=>{
-    if(IndicatorState){
-      
-      const res = dispatch(getEvents(JWTtokenSelect))
-    }
-  },[IndicatorState])
+    const res = dispatch(getEvents(JWTtokenSelect))
+  },[])
 
 
   useEffect(()=>{//       выборка но датам

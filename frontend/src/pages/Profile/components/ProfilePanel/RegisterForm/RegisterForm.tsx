@@ -1,13 +1,27 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useContext, useEffect, useRef, useState } from "react"; //ссылочки на HTML элементы
+import { useContext, useRef, useState } from "react"; //ссылочки на HTML элементы
 // import { RegisterUser } from "../../../../api/authService"; //не смог установить алиасы 
 import {useForm} from "react-hook-form";
-import styles from "../../Register.module.scss";
-import { useAppDispatch,useAppSelector } from "../../../../app/store";
-import { LoginUser, RegisterUser } from "../../../../api/authService";
+import styles from "./RegisterForm.module.scss";
+import { useAppDispatch,useAppSelector } from "../../../../../app/store";
+import { ChangeUser } from "../../../../../api/authService";
 // import { AuthorizationIndicatorContext } from "../../../../components/context/authorizationIndicator";
+
+// interface UserData {
+//   email: string;
+//   firstName?:string;//имя
+//   lastName?:string;//фамилия
+//   patronymic?:string;//отчество
+//   gender?: "М"| "Ж";
+//   birthday?: Date;
+//   password?: string;
+//   role?: 'user' | 'admin';
+// }
+
 export default function RegisterForm() {
-  
+
+  const user = useAppSelector(state=>state.auth.user)
+  const dialogRef = useRef<HTMLDialogElement>(null);
   interface Input{
     emailForm: string
     firstNameForm:string
@@ -18,45 +32,41 @@ export default function RegisterForm() {
     passwordForm:string
     roleForm:'user' | 'admin'
   }
+  let gender:'М'|'Ж' = "М"
+  if(user.gender){
+    gender = user.gender
+  }
   const {register, handleSubmit, formState:{errors}} = useForm<Input>({defaultValues:{
-    emailForm: "",
-    firstNameForm:"",
-    lastNameForm:"",
-    patronymicForm:"",
-    // genderForm:"М",
-    // birthdayForm:"",
-    passwordForm:"",
-    roleForm:'user'
+    emailForm: user.email? user.email : "",
+    firstNameForm:user.firstName? user.firstName : "",
+    lastNameForm:user.lastName? user.lastName : "",
+    patronymicForm:user.patronymic? user.patronymic : "",
+    genderForm:gender ,
+    birthdayForm:user.birthday? user.birthday : new Date("01.01.2001"),
+    passwordForm: "",
+    roleForm:user.role? user.role : 'user'
   }})
 
-  const navigate = useNavigate();
 
   const dispatch = useAppDispatch();//  выгружаем thunk для изменений значений
   const Indicator = useAppSelector(state => state.auth.isAuth)
-
-  useEffect(()=>{
-    if(Indicator){// если запрос авторизации прошёл успешно переходим на страницу событий
-      navigate("/events");
-    }
-  },[Indicator])
-
+  const JWTtokenSelect = useAppSelector(state => state.auth.isJWT)
   // let errorIndicator: boolean = false// если ошибка регистрации то становится true и выводится окно с ошибкой
   // const [errorText, setErrorText] = useState("")
   return (
-    <main className={styles.main}>
+    <>
+      <div className={styles.editingImg} onClick={()=>{
+        dialogRef.current?.showModal();
+      }}></div>
+      {/* <div className={styles.contaner}>
+      <div>
+        
+      </div>
+      
+    </div> */}
+    
+    <dialog ref={dialogRef} id={styles.myDialog}>
       <div className={styles.contaner}>
-
-      <div>{useAppSelector(state => state.auth.isError)}</div>{/* блок с ошибкой  */}
-
-        <div className="TimeSpark">
-          {/* <img src="" alt="" /> */}
-          <h1 className={styles.h1}>TimeSpark</h1>
-        </div>
-        <div className="new_account">
-          <h2 className={styles.h2}>Новый аккаунт</h2>
-          {/* <img src="" alt="" /> */}
-        </div>
-        {/* <div> */}
         <form 
           onSubmit = {handleSubmit((Data:Input) => {
             // event.preventDefault(); //предотвращает перезагрузку страници
@@ -70,21 +80,16 @@ export default function RegisterForm() {
               const role = Data.roleForm;
               
               const LoginAsync = async () => {
-                const IndicatorRegister = await dispatch(RegisterUser({//    отправляю запрос на регистрацию
+                const IndicatorRegister = await dispatch(ChangeUser({//    отправляю запрос на регистрацию
                   email,
                   firstName, lastName, patronymic, gender, birthday,
                   password,
-                  role,
+                  role,JWTtokenSelect
                 }))
-                if (IndicatorRegister){// авторизация в случае успешной регистрации (можно использовать useAppSelector(state => state.auth.isError)
-                  await dispatch(LoginUser({//    отправляю запрос на авторизацию
-                  email,
-                  password,
-                  }))
-                  
-                }
+                
               };
               LoginAsync();
+              dialogRef.current?.close();
             
           })}
           className={styles.form}
@@ -131,16 +136,23 @@ export default function RegisterForm() {
             <p>{errors.passwordForm?.message}</p>
           </div>
           {/* <input type="text" /> */}
-          <button type="submit" className={styles.button}>
-            Создать аккаунт
+          <div>
+            <button type="submit" className={styles.button}>
+            Изменить данные
           </button>
-          <p className={styles.p}>Уже зарегестрированы?</p>
-          <Link to="/login" className={styles.a}>
-            Войти в аккаунт
-          </Link>
+          </div>
+          <div>
+            <button type="button" className={styles.button} onClick={()=>{
+              dialogRef.current?.close();
+            }}>
+              Отменить изменение
+            </button>
+          </div>
+          
         </form>
-        {/* </div> */}
-      </div>
-    </main>
+        </div>
+        </dialog>
+        
+    </>
   );
 }

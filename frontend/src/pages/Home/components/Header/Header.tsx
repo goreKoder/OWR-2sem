@@ -2,14 +2,17 @@ import { useContext, useState } from "react";
 import styles from "./Header.module.scss";
 import { Link } from "react-router-dom";
 import { AuthorizationIndicatorContext } from "../../../../components/context/authorizationIndicator";
+import { useAppSelector } from "../../../../app/store";
 export default function Header() {
 
-    const {IndicatorState} = useContext(AuthorizationIndicatorContext)
+  // const {IndicatorState} = useContext(AuthorizationIndicatorContext)
     
   const [isOpen, setIsOpen] = useState<boolean>(false);
   function toggleMenu() {
     setIsOpen(!isOpen);
   }
+
+  const userName = useAppSelector(state => state.auth.user?.name)// выводим имя пользователя из стейта
   return (
     <>
       <header className={styles.header}>
@@ -21,14 +24,14 @@ export default function Header() {
             <Link to="*" className={styles.nav_a}>
               Проекты
             </Link>
-            {IndicatorState? <></> : <Link to="/register" className={styles.nav_a}>
+            {userName? <></> : <Link to="/register" className={styles.nav_a}>
               Регистрация
             </Link>}
             <Link to="/events" className={styles.nav_a}>
               Список мероприятий
             </Link>
           </nav>
-          <div>{IndicatorState? <><p className={styles.userName}>{localStorage.getItem("userName")}</p></>: <p className={styles.userName}>Неавторизованный пользователь</p>}
+          <div>{userName? <><p className={styles.userName}>{userName}</p></>: <p className={styles.userName}>Неавторизованный пользователь</p>}
           <div className={styles.burger_memu_div}>
             <input id={styles.burger_toggle} type="checkbox" />
             <label
@@ -50,7 +53,7 @@ export default function Header() {
                     Проекты
                   </Link>
                 </li>
-                {IndicatorState? <></> : <li>
+                {userName? <></> : <li>
                   <Link to="/register" className={styles.burger_nav_a}>
                     Регистрация
                   </Link>

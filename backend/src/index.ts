@@ -6,7 +6,7 @@ import morgan from 'morgan';
 import configurePassport from '@config/passport';
 import swaggerUi from 'swagger-ui-express';
 import swaggerJsDoc from 'swagger-jsdoc';
-import { errorHandler } from './errors';
+// import { errorHandler } from './errors';
 import loginJwt from '@routes/auth';
 import getEvent from '@routes/public';
 import forIndex from '@routes/index';
@@ -41,7 +41,7 @@ app.use('/auth', loginJwt);
 app.use('/public', configurePassport.authenticate('jwt', { session: false }), getEvent);
 app.use('/index', configurePassport.authenticate('jwt', { session: false }), forIndex);
 
-app.use(errorHandler);
+// app.use(errorHandler);
 
 // Запускаем сервер
 app.listen(PORT, 'localhost', (err) => {

@@ -1,11 +1,13 @@
 // import { Link } from 'react-router-dom'
 import styles from "../../Login.module.scss";
-import {  useContext } from "react";
+// import {  useContext, useState } from "react";
 import {useForm }from "react-hook-form"
 import { LoginUser } from "../../../../api/authService";//  функция авторизации
 import { useNavigate } from "react-router-dom";
 
-import {AuthorizationIndicatorContext} from "../../../../components/context/authorizationIndicator"
+// import {AuthorizationIndicatorContext} from "../../../../components/context/authorizationIndicator"
+import { useAppDispatch, useAppSelector } from "../../../../app/store";
+import { useEffect } from "react";
 
 export default function RegisterForm() {
 
@@ -20,12 +22,26 @@ export default function RegisterForm() {
     }
   })
 
-  const {setIndicatorState} = useContext(AuthorizationIndicatorContext)
+  // const {setIndicatorState} = useContext(AuthorizationIndicatorContext)
 
   const navigate = useNavigate(); //  неработает внутри асинхронных функций
+
+  const dispatch = useAppDispatch();//  выгружаем thunk для изменений значений
+  const error = useAppSelector(state => state.auth.isError)
+  const auth = useAppSelector(state => state.auth.isAuth)
+
+  useEffect(()=>{
+    if(auth){// если запрос авторизации прошёл успешно переходим на страницу событий
+                  navigate("/events");
+                }
+  },[auth])
+    // let errorIndicator: boolean = false// если ошибка регистрации то становится true и выводится окно с ошибкой
+    // const [errorText, setErrorText] = useState("")
   return (
     <main className={styles.main}>
       <div className={styles.contaner}>
+        {/* <div>{errorText}</div> */}
+        <div>{useAppSelector(state => state.auth.isError)}</div>{/* блок с ошибкой  */}
         <div className="TimeSpark">
           {/* <img className={styles.img} src="" alt="" /> */}
           <h1 className={styles.h1}>TimeSpark</h1>
@@ -39,14 +55,15 @@ export default function RegisterForm() {
               const password =  Data.passwordForm;
               const email = Data.emailForm;
               const LoginAsync = async () => {
-                const boolIndikat = await LoginUser({email , password});//  функция авторизации
-                if (boolIndikat == true) {
-                  setIndicatorState(true);//  индикатор авторизации должен стать true
-                  console.log("индикатор авторизации должен стать true")
-                  navigate("/events");//  переход на страницу с событиями
-                }
-              };
-              LoginAsync();
+                const IndicatorRegister = await dispatch(LoginUser({//    отправляю запрос на регистрацию
+                  email,
+                  password,
+                }))
+                console.log("error в Login = "+error)
+                console.log("пароль: "+password)
+                
+              }
+          LoginAsync();
           })}
           className={styles.form}
         >

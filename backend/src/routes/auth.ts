@@ -7,9 +7,13 @@ dotenv.config();
 const router = express.Router();
 interface UserData {
   email: string;
-  name: string;
+  firstName:string;//имя
+  lastName:string;//фамилия
+  patronymic:string;//отчество
+  gender: "М"| "Ж";
+  birthday: Date;
   password: string;
-  role: string;
+  role: 'user' | 'admin';
 }
 router.post('/register', async (req: Request, res: Response) => {
   /**
@@ -22,12 +26,12 @@ router.post('/register', async (req: Request, res: Response) => {
    *         description: регистрация
    */
   try {
-    const { email, name, password, role }: UserData = req.body;
-    const user = await User.create({ email, name, password, role: role as 'user' | 'admin' });
+    const { email, firstName,lastName,patronymic, password,gender,birthday, role }: UserData = req.body;
+    const user = await User.create({ email, firstName,lastName,patronymic, password,gender,birthday, role });
     res.status(200).send(user);
     console.log("Регистрация успешна")
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json("почта уже используется"+err);
   }
 });
 // {
@@ -57,8 +61,10 @@ router.post('/login', async (req: Request, res: Response) => {
     const JWTtocen = await createJWT(user, password);
     res.status(200).send({JWTtocen,user});
     console.log("Авторизация успешна")
+    console.log("токен отправлен")
   } catch (err) {
     res.status(500).json(err);
+    console.log("токен не отправлен"+err)
   }
 });
 export default router;

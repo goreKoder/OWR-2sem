@@ -1,11 +1,12 @@
 import styles from "./CreatEvent.module.scss";
 import { useRef,useContext } from "react";
-import { postEventsapi } from "../../../../../api/eventService";
-
-import { AuthorizationIndicatorContext } from "../../../../../components/context/authorizationIndicator";
+import { getEvents, postEvents } from "../../api/eventService";
 import { useForm } from "react-hook-form";
+import { useAppDispatch, useAppSelector } from "../../app/store";
 export default function CreatEvent() {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const JWTtokenSelect = useAppSelector(state => state.auth.isJWT)//  кастомным хуком вытаскиваю состояние
+  console.log(typeof JWTtokenSelect)
 
   interface Input{
       titleForm: string,
@@ -18,8 +19,9 @@ export default function CreatEvent() {
         descriptionForm:"",
       },
     })
-
-  const {CreatEventState, setCreatEventState} = useContext(AuthorizationIndicatorContext)
+    const dispatch = useAppDispatch()
+    const error = useAppSelector(state => state.event.isError)
+  // const {CreatEventState, setCreatEventState} = useContext(AuthorizationIndicatorContext)
   return (
     <>
     <div className={styles.add_task}>
@@ -33,18 +35,18 @@ export default function CreatEvent() {
         </div>
         <dialog ref={dialogRef} id={styles.myDialog}>
           <form method="dialog" onSubmit={handleSubmit((Data) => {
-                    const title = Data.titleForm;
-                    const description = Data.descriptionForm;
-                    const date: Date = new Date(Data.dateForm);
-                    async function EventAsync (){
-                      const request = await postEventsapi({ title, description, date });
-                      if(request){
-                        setCreatEventState(!CreatEventState);
-                      }
-                    }
-                    EventAsync()
-                    dialogRef.current?.close(); //   закрываю модалку
-                })} className={styles.form} >
+            const title = Data.titleForm;
+            const description = Data.descriptionForm;
+            const date: Date = new Date(Data.dateForm);
+            async function EventAsync() {
+              const request = await dispatch(postEvents({ title, description, date,JWTtokenSelect }));//   запрос на изменение
+              if(!error){
+                await dispatch(getEvents(JWTtokenSelect))//   запрос на получение списка ивентов (возможно стоит убрать await, и выводить загрузку на странице Events)
+              }
+              }
+            EventAsync()
+            dialogRef.current?.close(); //   закрываю модалку
+          })} className={styles.form} >
             
             <input {...register("titleForm", {required: "обязательное поле title"})}
               placeholder="Название"
