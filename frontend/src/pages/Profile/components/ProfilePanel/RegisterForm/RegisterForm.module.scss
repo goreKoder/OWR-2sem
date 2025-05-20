@@ -1,0 +1,62 @@
+// @import '';
+.contaner{
+    // position: absolute;
+    display: inline-flex;
+    align-items:center;
+    // width: auto;
+    height: 100%;
+    width: 100%;
+    // top: 0;
+    // left: 0;
+    // border:none;
+
+}
+#myDialog{
+    // top: 0;
+    background: rgba(0, 0, 0, 0.5);
+    // left: 0;
+    left: 50%;
+        top: 50%;
+    transform: translate(-50%, -50%);
+    position: absolute;
+    // z-index: -20;
+    border:none;
+    // margin-top: 20vh;
+    // text-align: center;
+    // display: flex;
+    // display: inline-flex;
+    justify-content: center;
+    align-items:center;
+    height: 100vh;
+    width: 100%;
+    // position: absolute;
+    >div{
+        display: inline-flex;
+        justify-content: center;
+    }
+}
+.form{
+    // height: auto;
+    height: fit-content;
+    display: inline-block;
+    width: auto;
+    z-index: 10;
+    // width: 8rem;
+    background-color: aliceblue;
+    border-radius:10px;
+    padding: 2rem;
+    >div{
+        >p{
+            color: red;
+        }
+        padding: 0.4rem;
+    }
+}
+.editingImg{
+    // z-index: 21;
+    height: 2rem;
+    width: 2rem;
+    background-image: url("../../../../../assets/079a034d9d13ac30f1bef5368293ba3a.png");
+    background-size:cover;
+}
+

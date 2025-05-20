@@ -7,11 +7,17 @@ import Events from "./pages/Events/Events";
 import Register from "./pages/Register/Register";
 import Login from "./pages/Login/Login";
 import NotFound from "./pages/NotFound/NotFound";
+import Profile from "./pages/Profile/Profile";
 
-import {AuthorizationIndicatorProvider} from './components/context/authorizationIndicator'
+import { Provider } from "react-redux";//   обёртка для компонентов 
+import { store } from "./app/store";
+import ErrorBlock from "./components/ErrorBlock/ErrorBlock";
+// import {AuthorizationIndicatorProvider} from './components/context/authorizationIndicator'// useContecst
 function App() {
   return (
-    <AuthorizationIndicatorProvider>
+    <Provider store={store}>
+      <ErrorBlock/>
+    {/* <AuthorizationIndicatorProvider> */}
       <BrowserRouter>
         <BodyClassManager />
         <Routes>
@@ -19,10 +25,12 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/profile" element={<Profile/>}/>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-    </AuthorizationIndicatorProvider>
+    {/* </AuthorizationIndicatorProvider> */}
+    </Provider>
   );
 }
 

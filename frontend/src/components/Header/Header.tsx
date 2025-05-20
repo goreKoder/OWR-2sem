@@ -1,18 +1,24 @@
 import styles from "./Header.module.scss";
 import { Link } from "react-router-dom";
-import { useState, useContext } from "react";
-import { AuthorizationIndicatorContext } from "../../../../components/context/authorizationIndicator";
-import { useAppSelector } from "../../../../app/store";
+import { useState, useContext, useEffect } from "react";
+import { useAppSelector } from "../../app/store";
+import {useLocation} from "react-router-dom"//  буду смотреть на текущий путь и выбирать стили
+
 export default function Header() {
 
-  // const {IndicatorState} = useContext(AuthorizationIndicatorContext)
+  const location = useLocation()
+  // useEffect(()=>{
+  //   let nav_a = document.getElementsByClassName("nav_a")
+  //   nav_a.
+  // },[location.pathname])
 
   const [isOpen, setIsOpen] = useState<boolean>(false);// штука для бургер меню
   function toggleMenu() {
     setIsOpen(!isOpen);
   }
 
-  const userName = useAppSelector(state => state.auth.user?.name)// выводим имя пользователя из стейта
+  const userName = useAppSelector(state => state.auth.user?.firstName)// выводим имя пользователя из стейта
+
   return (
     <>
       <header className={styles.header}>
@@ -28,10 +34,10 @@ export default function Header() {
             {userName?<></> :<Link to="/register" className={styles.nav_a}>
               Регистрация
             </Link>}
-            <p className="i_here">Список мероприятий</p>
+            <Link to="/events" className={styles.nav_a}>Список мероприятий</Link>
             {/*надо будет поменят клас*/}
           </nav>
-          <div>{userName? <><p className={styles.userName}>{userName}</p></>: <p className={styles.userName}>Неавторизованный пользователь</p>}{/* отображение имени авторизованного пользователя*/}
+          <div className={styles.userNameDiv}>{userName? <><Link to="/profile" className={styles.userName}>{userName}</Link></>: <p className={styles.userName}>Неавторизованный пользователь</p>}{/* отображение имени авторизованного пользователя*/}
           <div className={styles.burger_memu_div}>
             <input id={styles.burger_toggle} type="checkbox" />
             <label
@@ -46,7 +52,7 @@ export default function Header() {
             >
               <ul>
                 <li>
-                  <Link to="/events" className={styles.burger_nav_a}>
+                  <Link to="/" className={styles.burger_nav_a}>
                     Главная
                   </Link>
                 </li>
@@ -62,7 +68,11 @@ export default function Header() {
                 </li>}
                 
                 <li>
-                  <p className={styles.burger_i_here}>Список мероприятий</p>
+                  <Link to="/events" className={styles.burger_nav_a}>Список мероприятий</Link>
+            
+                </li>
+                <li>
+                  <Link to="/profile" className={styles.burger_nav_a}>Профиль пользователя</Link>
                 </li>
               </ul>
             </div>

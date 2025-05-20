@@ -5,7 +5,12 @@ import Event from './events';
 // 1. Интерфейс для атрибутов пользователя
 interface UserAttributes {
   id: number;
-  name: string;
+  // name: string;
+  firstName:string;//имя
+  lastName:string;//фамилия
+  patronymic:string;//отчество
+  gender: "М"| "Ж";
+  birthday: Date;
   email: string;
   password: string;
   role: 'user' | 'admin';
@@ -18,7 +23,12 @@ type UserCreationAttributes = Optional<UserAttributes, 'id'>;
 // 3. Класс модели с типизацией
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
   declare id: number;
-  declare name: string;
+  // declare name: string;
+  declare firstName:string;//имя
+  declare lastName:string;//фамилия
+  declare patronymic:string;//отчество
+  declare gender: "М"| "Ж";
+  declare birthday: Date;
   declare email: string;
   declare password: string;
   declare role: 'user' | 'admin';
@@ -36,8 +46,24 @@ User.init(
       autoIncrement: true,
       primaryKey: true,
     },
-    name: {
+    firstName: {
       type: DataTypes.STRING,
+      allowNull: false, // Обязательное поле
+    },
+    lastName: {
+      type: DataTypes.STRING,
+      allowNull: false, // Обязательное поле
+    },
+    patronymic: {
+      type: DataTypes.STRING,
+      allowNull: true, // Не обязательное поле
+    },
+    gender: {
+      type: DataTypes.ENUM('М', 'Ж'), // Добавляем поле role
+      
+    },
+    birthday: {
+      type: DataTypes.DATE,
       allowNull: false, // Обязательное поле
     },
     email: {

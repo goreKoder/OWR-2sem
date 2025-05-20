@@ -1,13 +1,18 @@
 import styles from "./ChangeEvent.module.scss";
 import { useRef,useContext } from "react";
-import { putEventsapi } from "../../../../../api/eventService";
+// import { putEventsapi } from "../../../../../api/eventService";
 import {useForm} from "react-hook-form"
-import { AuthorizationIndicatorContext } from "../../../../../components/context/authorizationIndicator";
+
+import { useAppDispatch, useAppSelector } from "../../app/store";
+import {postEvents,getEvents, putEvents} from "../../api/eventService"
+
 interface Props {
   id: number | undefined;
 }
 export default function ChangeEvent({ id }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const JWTtokenSelect = useAppSelector(state => state.auth.isJWT)//  кастомным хуком вытаскиваю состояние
+  const error = useAppSelector(state => state.event.isError)
 
   interface Input{
     titleForm: string,
@@ -21,8 +26,8 @@ export default function ChangeEvent({ id }: Props) {
     },
   })
 
-  const {ChangeEventState, setChangeEventState} = useContext(AuthorizationIndicatorContext)
-
+  // const {ChangeEventState, setChangeEventState} = useContext(AuthorizationIndicatorContext)
+  const dispatch = useAppDispatch()
   return (
     <>
       <button
@@ -41,10 +46,9 @@ export default function ChangeEvent({ id }: Props) {
                     const description = Data.descriptionForm;
                     const date: Date = new Date(Data.dateForm);
                     async function EventAsync() {
-                      const request = await putEventsapi({ title, description, date, id });//   запрос на изменение
-                    if(request === true){
-                      setChangeEventState(!ChangeEventState)//  смена состояния
-                      console.log("вроде изменилось"+ChangeEventState)
+                      const request = await dispatch(putEvents({ title, description, date, id,JWTtokenSelect }));//   запрос на изменение
+                    if(!error){
+                      await dispatch(getEvents(JWTtokenSelect))//   запрос на получение списка ивентов (возможно стоит убрать await, и выводить загрузку на странице Events)
                     }
                     }
                     EventAsync()

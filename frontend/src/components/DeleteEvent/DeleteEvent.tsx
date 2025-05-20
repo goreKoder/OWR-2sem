@@ -1,17 +1,20 @@
 import styles from "./DeleteEvent.module.scss";
-import { deleteEventsapi } from "../../../../../api/eventService";
+// import { deleteEventsapi } from "../../../../../api/eventService";
 import { useContext,useRef } from "react";
-
-import { AuthorizationIndicatorContext } from "../../../../../components/context/authorizationIndicator";
+import { deleteEvents, getEvents, postEvents } from "../../api/eventService";
+import { useAppDispatch, useAppSelector } from "../../app/store";
 interface Props {
   id: number | undefined;
 }
 export default function DeleteEvent({ id }: Props) {
 
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const JWTtokenSelect = useAppSelector(state => state.auth.isJWT)//  кастомным хуком вытаскиваю состояние
+  const error = useAppSelector(state => state.event.isError)
 
-  const {DeleteEventState, setDeleteEventState} = useContext(AuthorizationIndicatorContext)
 
+  const dispatch = useAppDispatch()
+  
   return (
     <>
     <div
@@ -27,12 +30,12 @@ export default function DeleteEvent({ id }: Props) {
         <div>
         <button
           onClick={() => {
-            async function EventAsync(){
-              const request = await deleteEventsapi({ id });
-              if(request){
-                setDeleteEventState(!DeleteEventState)
+            async function EventAsync() {
+              const request = await dispatch(deleteEvents({ id,JWTtokenSelect }));//   запрос на изменение
+              if(!error){
+                await dispatch(getEvents(JWTtokenSelect))//   запрос на получение списка ивентов (возможно стоит убрать await, и выводить загрузку на странице Events)
               }
-            }
+              }
             EventAsync()
             dialogRef.current?.close();
           }}

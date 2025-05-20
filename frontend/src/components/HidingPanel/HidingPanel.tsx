@@ -10,7 +10,7 @@ export default function HidingPanel({ registerIndicatorProps }: DialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    if (registerIndicatorProps === true) {
+    if (registerIndicatorProps) {
       console.log("НЕ должна появиться модалка" + registerIndicatorProps);
       dialogRef.current?.close();
     } else {

@@ -27,7 +27,11 @@ passport.use(
 );
 interface UserAttributes {
   id: number;
-  name: string;
+  firstName:string;//имя
+  lastName:string;//фамилия
+  patronymic:string;//отчество
+  gender: "М"| "Ж";
+  birthday: Date;
   email: string;
   password: string;
   role: 'user' | 'admin';

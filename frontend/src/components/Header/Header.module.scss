@@ -1,0 +1,119 @@
+
+    .header {
+        width: 100%;
+      
+        // Стили для навигационного блока
+        > div:first-child {
+          display: flex;
+          justify-content: space-between;
+          margin: 20px 80px;
+          > nav {
+            display: flex;
+            justify-content: space-between;
+            p, a {
+              padding-right: 20px;
+            }
+          }
+        }
+      
+        // Стили для бургер-меню
+        > div:last-child {
+          input[type="checkbox"] {
+            display: none;
+      
+            &:checked ~ div {
+              display: block;
+            }
+          }
+          > div {
+      
+            ul {
+              list-style: none;
+              padding: 0;
+              
+              
+            }
+          }
+        }
+      }
+
+
+      .burger{
+        display: none;
+        position: relative;
+        right: 0;
+        
+        align-items:center;
+        width: 30px;
+        height: 20px;
+    }
+      .burger_memu{
+        display: none;
+        background-color:rgb(25, 37, 37);
+        position: absolute;
+        margin-top: 1rem;
+        margin-right: 1rem;
+        padding: 0.5rem;
+        // opacity: 0;
+        z-index: 50;
+
+      }
+      .burger_nav_a, .nav_a, .userName {
+        text-decoration: none;
+        color: rgb(0, 0, 0);
+      }
+      .burger::before, .burger::after, .burger span{
+        position: absolute;
+        content: '';
+        height: 2px;
+        width: 80%;
+        background-color:#ffffff;
+        transition: all 0.3s ease 0s;
+    } 
+    .burger::before{ top: 0px }
+    .burger::after{ bottom: 0px }
+    .activ::before{
+        top: 50%;
+        transform: translate(0, -50%) rotate(-45deg);;
+        /* transform: rotate(-45deg); */
+    }
+    .activ::after{
+        bottom: 50%;
+        transform: translate(0, 50%) rotate(45deg);
+        /* transform: rotate(45deg); */
+    }
+    .activ span{
+        transform:  scale(0);
+    }
+    .show{
+        display: block;
+        transform: translateY(0);
+        opacity: 1;
+    }
+    #burger_toggle{ /* невидимый чекбокс */
+        display: none;
+    }
+
+
+
+      @media (max-width: 700px) {
+        .header {
+          width: 100%;
+        
+          // Стили для навигационного блока
+          > div:first-child {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 80px;
+        
+            > nav {
+              display:none ;
+            }
+          }}
+          .burger{
+            display: flex;
+          }
+          .userNameDiv{
+            display: none;//  убераем профиль пользователя (он есть в бургер меню)
+          }
+    }

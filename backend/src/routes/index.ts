@@ -1,6 +1,7 @@
 import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import Event from '@SQLtables/events';
+import User from '@SQLtables/users'
 import { ValidationError, NotFoundError } from '../errors';
 import { getUserID } from '@config/passport';
 import dotenv from 'dotenv';
@@ -33,7 +34,7 @@ router.get('/events', async (req: Request, res: Response) => {
       token = authorization.split(' ')[1];
     }
 
-    const UserID = await getUserID(token);// Поиск мероприятия по ID
+    const UserID = await getUserID(token);// Поиск ID пользователя по токену
     const eventss = await Event.findAll({
       where: {
         createdby: UserID, // Ищем все события, где userId равен переданному значению
@@ -42,6 +43,7 @@ router.get('/events', async (req: Request, res: Response) => {
     res.status(200).json(eventss);
     console.log("Массив отправлен")
   } catch (err) {
+    console.log("ошибка отправки массива")
     res.json(new NotFoundError('событие не нейдено' + err));
   }
 });
@@ -74,7 +76,9 @@ router.post('/events', async (req: Request, res: Response) => {
       enddate,
     });
     res.status(201).json(events);
+    console.log("Добавлено событие")
   } catch (err) {
+    console.log("Не добавлено событие")
     res.json(new ValidationError('ошибка валидации' + err));
   }
   // {
@@ -116,7 +120,9 @@ router.put('/events/:id', async (req: Request, res: Response) => {
       res.send(new NotFoundError('событие не нейдено'));
     }
     res.status(200).json(updatedUser); // Отправляем обновленного пользователя
+    console.log("Изменено событие")
   } catch (err) {
+    console.log("Не изменено событие")
     res.send(new ValidationError('ошибка валидации ' + err));
   }
 });
@@ -148,8 +154,40 @@ router.delete('/events/:id', async (req: Request, res: Response) => {
       },
     });
     res.status(200).json(del);
+    console.log("Удалено событие")
   } catch (err) {
+    console.log("Не удалено событие")
     res.send(new NotFoundError('событие не нейдено ' + err));
+  }
+});
+router.put('/user', async (req: Request, res: Response) => {
+  /**
+   * @swagger
+   * /user:
+   *   patch:
+   *     summary:
+   *     responses:
+   *       200:
+   *         description: изменяем роль пользователя
+   */
+
+  try {
+    let token: string = '';
+    const authorization = req.headers['authorization']; // Извлечение токена
+    if (authorization) {
+      token = authorization.split(' ')[1];
+    }
+    const userId = await getUserID(token);
+    
+      const [updatedRowsCount, [updatedUser]] = await User.update(req.body, {
+        where: { id: userId }, // Условие для поиска пользователя
+        returning: true, // Возвращаем обновленную запись
+      });
+      res.status(200).json(updatedUser);
+      console.log("удалось изменить пользователя"+ updatedUser)
+  } catch (err) {
+    console.log("Не удалось изменить пользователя")
+    res.status(500).json('ошибка сервера ' + err);
   }
 });
 export default router;
